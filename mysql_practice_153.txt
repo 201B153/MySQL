@@ -1,0 +1,405 @@
+
+Welcome to the MySQL monitor. 
+
+mysql> show tables;
++------------------------------+
+| Tables_in_mysql_practice_153 |
++------------------------------+
+| department                   |
+| dependent                    |
+| dept_locations               |
+| employee                     |
+| project                      |
+| works_on                     |
++------------------------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from employee;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_Ssn | Dno  |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731-foundren Houston, Tx | m    |  30000 | 333445555 |    5 |
+| Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx     | m    |  40000 | 888665555 |    5 |
+| Alicia   | J     | Zelaya  | 999887777 | 1941-06-20 | 321 castie spring, Tx    | F    |  25000 | 987654321 |    4 |
+| Jennifer | S     | Wallace | 987654321 | 1962-09-15 | 291 berry bellaire, Tx   | F    |  43000 | 888665555 |    4 |
+| Ramesh   | K     | Narayan | 666884444 | 1968-01-19 | 975 fire oak  humble, Tx | m    |  38000 | 333445555 |    5 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5361 rice   houston, Tx  | f    |  25000 | 333445555 |    5 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 dallas  Houston, Tx  | m    |  25000 | 987654321 |    4 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450  stone  Houston, Tx  | m    |  55000 |      NULL |    1 |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+8 rows in set (0.00 sec)
+
+mysql> select * from department;
++----------------+---------+-----------+----------------+
+| Dname          | Dnumber | Mgr_Ssn   | Mgr_start_date |
++----------------+---------+-----------+----------------+
+| RESEARCH       |       5 | 333445555 | 1988-05-22     |
+| ADMINISTRATION |       4 | 987654321 | 1995-01-01     |
+| HEADQUARTERS   |       1 | 888665555 | 1981-06-19     |
++----------------+---------+-----------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from project;
++-----------------+---------+-----------+------+
+| Pname           | Pnumber | Plocation | Dnum |
++-----------------+---------+-----------+------+
+| productx        |       1 | bellaire  |    5 |
+| producty        |       2 | sugarland |    5 |
+| productz        |       3 | houston   |    5 |
+| computerization |      10 | stafford  |    4 |
+| reorganization  |      20 | houston   |    1 |
+| newbenefits     |      30 | stafford  |    4 |
++-----------------+---------+-----------+------+
+6 rows in set (0.05 sec)
+
+mysql> select * from works_on;
++-----------+------+-------+
+| Essn      | Pno  | Hours |
++-----------+------+-------+
+| 123456789 |    1 |    33 |
+| 123456789 |    2 |     8 |
+| 666884444 |    3 |    40 |
+| 453453453 |    1 |    20 |
+| 453453453 |    2 |    20 |
+| 333445555 |    2 |    10 |
+| 333445555 |    3 |    10 |
+| 333445555 |   10 |    10 |
+| 333445555 |   20 |    10 |
+| 999887777 |   30 |    30 |
+| 999887777 |   10 |    10 |
+| 987987987 |   10 |    35 |
+| 987987987 |   30 |     5 |
+| 987654321 |   30 |    20 |
+| 987654321 |   20 |    15 |
+| 888665555 |   20 |  NULL |
++-----------+------+-------+
+16 rows in set (0.04 sec)
+
+mysql> select * from dependent;
++------+----------------+-----+------------+
+| ESSN | DEPENDENT_NAME | SEX | BDATE      |
++------+----------------+-----+------------+
+|  123 | ALICIA         | F   | 1978-12-12 |
+|  124 | THEODORE       | M   | 1983-10-25 |
+|  125 | JOY            | F   | 1958-05-03 |
+|  126 | ABNER          | M   | 1942-02-28 |
+| 1256 | OLIVE          | F   | NULL       |
++------+----------------+-----+------------+
+5 rows in set (0.04 sec)
+
+mysql> select * from dept_locations;
++---------+-----------+
+| Dnumber | Dlocation |
++---------+-----------+
+|       1 | Houston   |
+|       4 | Stafford  |
+|       5 | Sugarland |
+|       5 | Bellaire  |
+|       5 | Houston   |
++---------+-----------+
+5 rows in set (0.02 sec)
+
+mysql> select max(salary) from employee;
++-------------+
+| max(salary) |
++-------------+
+|       55000 |
++-------------+
+1 row in set (0.04 sec)
+
+mysql> select fname, lname, salary from employee where salary = (select max(salary) from employee);
++-------+-------+--------+
+| fname | lname | salary |
++-------+-------+--------+
+| James | Borg  |  55000 |
++-------+-------+--------+
+1 row in set (0.03 sec)
+
+mysql> select fname, ssn from employee union select dname, mgr_ssn from department;
++----------------+-----------+
+| fname          | ssn       |
++----------------+-----------+
+| John           | 123456789 |
+| Franklin       | 333445555 |
+| Alicia         | 999887777 |
+| Jennifer       | 987654321 |
+| Ramesh         | 666884444 |
+| Joyce          | 453453453 |
+| Ahmad          | 987987987 |
+| James          | 888665555 |
+| RESEARCH       | 333445555 |
+| ADMINISTRATION | 987654321 |
+| HEADQUARTERS   | 888665555 |
++----------------+-----------+
+11 rows in set (0.03 sec)
+
+mysql> select fname from employee left join department on ssn = Mgr_ssn;
++----------+
+| fname    |
++----------+
+| John     |
+| Franklin |
+| Alicia   |
+| Jennifer |
+| Ramesh   |
+| Joyce    |
+| Ahmad    |
+| James    |
++----------+
+8 rows in set (0.00 sec)
+
+mysql> select dno, max(salary) from employee group by dno;
++------+-------------+
+| dno  | max(salary) |
++------+-------------+
+|    5 |       40000 |
+|    4 |       43000 |
+|    1 |       55000 |
++------+-------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from employee inner join department on dno = dnumber;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------------+---------+-----------+----------------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_Ssn | Dno  | Dname          | Dnumber | Mgr_Ssn   | Mgr_start_date |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------------+---------+-----------+----------------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731-foundren Houston, Tx | m    |  30000 | 333445555 |    5 | RESEARCH       |       5 | 333445555 | 1988-05-22     |
+| Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx     | m    |  40000 | 888665555 |    5 | RESEARCH       |       5 | 333445555 | 1988-05-22     |
+| Alicia   | J     | Zelaya  | 999887777 | 1941-06-20 | 321 castie spring, Tx    | F    |  25000 | 987654321 |    4 | ADMINISTRATION |       4 | 987654321 | 1995-01-01     |
+| Jennifer | S     | Wallace | 987654321 | 1962-09-15 | 291 berry bellaire, Tx   | F    |  43000 | 888665555 |    4 | ADMINISTRATION |       4 | 987654321 | 1995-01-01     |
+| Ramesh   | K     | Narayan | 666884444 | 1968-01-19 | 975 fire oak  humble, Tx | m    |  38000 | 333445555 |    5 | RESEARCH       |       5 | 333445555 | 1988-05-22     |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5361 rice   houston, Tx  | f    |  25000 | 333445555 |    5 | RESEARCH       |       5 | 333445555 | 1988-05-22     |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 dallas  Houston, Tx  | m    |  25000 | 987654321 |    4 | ADMINISTRATION |       4 | 987654321 | 1995-01-01     |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450  stone  Houston, Tx  | m    |  55000 |      NULL |    1 | HEADQUARTERS   |       1 | 888665555 | 1981-06-19     |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------------+---------+-----------+----------------+
+8 rows in set (0.00 sec)
+
+mysql> select * from employee E1 inner join employee E2 on E1.super_ssn = E2.ssn;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------+-------+---------+-----------+------------+-------------------------+------+--------+-----------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_Ssn | Dno  | Fname    | Minit | Lname   | Ssn       | Bdate      | Address                 | Sex  | Salary | Super_Ssn | Dno  |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------+-------+---------+-----------+------------+-------------------------+------+--------+-----------+------+
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5361 rice   houston, Tx  | f    |  25000 | 333445555 |    5 | Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx    | m    |  40000 | 888665555 |    5 |
+| Ramesh   | K     | Narayan | 666884444 | 1968-01-19 | 975 fire oak  humble, Tx | m    |  38000 | 333445555 |    5 | Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx    | m    |  40000 | 888665555 |    5 |
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731-foundren Houston, Tx | m    |  30000 | 333445555 |    5 | Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx    | m    |  40000 | 888665555 |    5 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 dallas  Houston, Tx  | m    |  25000 | 987654321 |    4 | Jennifer | S     | Wallace | 987654321 | 1962-09-15 | 291 berry bellaire, Tx  | F    |  43000 | 888665555 |    4 |
+| Alicia   | J     | Zelaya  | 999887777 | 1941-06-20 | 321 castie spring, Tx    | F    |  25000 | 987654321 |    4 | Jennifer | S     | Wallace | 987654321 | 1962-09-15 | 291 berry bellaire, Tx  | F    |  43000 | 888665555 |    4 |
+| Jennifer | S     | Wallace | 987654321 | 1962-09-15 | 291 berry bellaire, Tx   | F    |  43000 | 888665555 |    4 | James    | E     | Borg    | 888665555 | 1937-11-10 | 450  stone  Houston, Tx | m    |  55000 |      NULL |    1 |
+| Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx     | m    |  40000 | 888665555 |    5 | James    | E     | Borg    | 888665555 | 1937-11-10 | 450  stone  Houston, Tx | m    |  55000 |      NULL |    1 |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------+-------+---------+-----------+------------+-------------------------+------+--------+-----------+------+
+7 rows in set (0.05 sec)
+
+mysql> create table emp_dept as select * from employee inner join department;
+Query OK, 24 rows affected (0.11 sec)
+Records: 24  Duplicates: 0  Warnings: 0
+
+mysql> desc emp_dept;
++----------------+--------------+------+-----+---------+-------+
+| Field          | Type         | Null | Key | Default | Extra |
++----------------+--------------+------+-----+---------+-------+
+| Fname          | varchar(10)  | YES  |     | NULL    |       |
+| Minit          | char(1)      | YES  |     | NULL    |       |
+| Lname          | varchar(10)  | YES  |     | NULL    |       |
+| Ssn            | decimal(9,0) | YES  |     | NULL    |       |
+| Bdate          | date         | YES  |     | NULL    |       |
+| Address        | varchar(255) | YES  |     | NULL    |       |
+| Sex            | char(2)      | YES  |     | NULL    |       |
+| Salary         | decimal(9,0) | YES  |     | NULL    |       |
+| Super_Ssn      | decimal(9,0) | YES  |     | NULL    |       |
+| Dno            | decimal(2,0) | YES  |     | NULL    |       |
+| Dname          | varchar(20)  | YES  |     | NULL    |       |
+| Dnumber        | decimal(2,0) | YES  |     | NULL    |       |
+| Mgr_Ssn        | decimal(9,0) | YES  |     | NULL    |       |
+| Mgr_start_date | date         | YES  |     | NULL    |       |
++----------------+--------------+------+-----+---------+-------+
+14 rows in set (0.01 sec)
+
+mysql> select * from employee where (select AVG(salary) from employee) > 30000;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_Ssn | Dno  |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731-foundren Houston, Tx | m    |  30000 | 333445555 |    5 |
+| Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx     | m    |  40000 | 888665555 |    5 |
+| Alicia   | J     | Zelaya  | 999887777 | 1941-06-20 | 321 castie spring, Tx    | F    |  25000 | 987654321 |    4 |
+| Jennifer | S     | Wallace | 987654321 | 1962-09-15 | 291 berry bellaire, Tx   | F    |  43000 | 888665555 |    4 |
+| Ramesh   | K     | Narayan | 666884444 | 1968-01-19 | 975 fire oak  humble, Tx | m    |  38000 | 333445555 |    5 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5361 rice   houston, Tx  | f    |  25000 | 333445555 |    5 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 dallas  Houston, Tx  | m    |  25000 | 987654321 |    4 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450  stone  Houston, Tx  | m    |  55000 |      NULL |    1 |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+8 rows in set (0.05 sec)
+
+mysql> select E.dno, E.salary,D.dname from employee E cross join department D on D.dnumber=E.dno;
++------+--------+----------------+
+| dno  | salary | dname          |
++------+--------+----------------+
+|    5 |  30000 | RESEARCH       |
+|    5 |  40000 | RESEARCH       |
+|    4 |  25000 | ADMINISTRATION |
+|    4 |  43000 | ADMINISTRATION |
+|    5 |  38000 | RESEARCH       |
+|    5 |  25000 | RESEARCH       |
+|    4 |  25000 | ADMINISTRATION |
+|    1 |  55000 | HEADQUARTERS   |
++------+--------+----------------+
+8 rows in set (0.00 sec)
+
+mysql> create table Q1avg_sal as select E.dno, E.salary,D.dname from employee E cross join department D on D.dnumber=E.dno;
+Query OK, 8 rows affected (0.09 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> select AVG(salary) from Q1avg_sal;
++-------------+
+| AVG(salary) |
++-------------+
+|  35125.0000 |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> select AVG(salary) from Q1avg_sal where dno=5;
++-------------+
+| AVG(salary) |
++-------------+
+|  33250.0000 |
++-------------+
+1 row in set (0.04 sec)
+
+mysql> select dno, (select AVg(salary) from Q1avg_sal where dno=5), (select AVg(salary) from Q1avg_sal where dno=4), (select AVg(salary) from Q1avg_sal where dno=1) from employee group by dno;
++------+-------------------------------------------------+-------------------------------------------------+-------------------------------------------------+
+| dno  | (select AVg(salary) from Q1avg_sal where dno=5) | (select AVg(salary) from Q1avg_sal where dno=4) | (select AVg(salary) from Q1avg_sal where dno=1) |
++------+-------------------------------------------------+-------------------------------------------------+-------------------------------------------------+
+|    5 |                                      33250.0000 |                                      31000.0000 |                                      55000.0000 |
+|    4 |                                      33250.0000 |                                      31000.0000 |                                      55000.0000 |
+|    1 |                                      33250.0000 |                                      31000.0000 |                                      55000.0000 |
++------+-------------------------------------------------+-------------------------------------------------+-------------------------------------------------+
+3 rows in set (0.06 sec)
+
+mysql> SELECT Dname, COUNT(*) FROM DEPARTMENT INNER JOIN EMPLOYEE ON DNUMBER = DNO  GROUP BY DNO HAVING AVG(SALARY) > 30000;
++----------------+----------+
+| Dname          | COUNT(*) |
++----------------+----------+
+| RESEARCH       |        4 |
+| ADMINISTRATION |        3 |
+| HEADQUARTERS   |        1 |
++----------------+----------+
+3 rows in set (0.04 sec)
+
+mysql> SELECT Dname, COUNT(*) FROM DEPARTMENT INNER JOIN EMPLOYEE ON DNUMBER = DNO AND SALARY > 20000 AND SEX = 'M' GROUP BY DNO;
++----------------+----------+
+| Dname          | COUNT(*) |
++----------------+----------+
+| RESEARCH       |        3 |
+| ADMINISTRATION |        1 |
+| HEADQUARTERS   |        1 |
++----------------+----------+
+3 rows in set (0.04 sec)
+
+mysql> SELECT Fname, Lname from EMPLOYEE WHERE dno = (SELECT DNO FROM EMPLOYEE where SALARY = (SELECT MAX(SALARY) FROM EMPLOYEE) );
++-------+-------+
+| Fname | Lname |
++-------+-------+
+| James | Borg  |
++-------+-------+
+1 row in set (0.03 sec)
+
+mysql> SELECT E.Fname, E.Lname FROM Employee AS E INNER JOIN Employee AS S ON E.Super_Ssn = S.Ssn AND S.Super_Ssn = 888665555;
++--------+---------+
+| Fname  | Lname   |
++--------+---------+
+| John   | Smith   |
+| Alicia | Zelaya  |
+| Ramesh | Narayan |
+| Joyce  | English |
+| Ahmad  | Jabbar  |
++--------+---------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT Fname, Lname FROM EMPLOYEE WHERE SALARY > (SELECT MIN(SALARY) FROM EMPLOYEE)+10000;
++----------+---------+
+| Fname    | Lname   |
++----------+---------+
+| Franklin | wong    |
+| Jennifer | Wallace |
+| Ramesh   | Narayan |
+| James    | Borg    |
++----------+---------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT Essn FROM works_on INNER JOIN department ON Essn = Mgr_Ssn and  Pno IN (1,2,3) GROUP BY Essn;
++-----------+
+| Essn      |
++-----------+
+| 333445555 |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT Dname, SUM(SALARY), MAX(SALARY) , MIN(SALARY) , AVG(SALARY) FROM DEPARTMENT INNER JOIN EMPLOYEE ON DNUMBER = DNO GROUP BY DNO;
++----------------+-------------+-------------+-------------+-------------+
+| Dname          | SUM(SALARY) | MAX(SALARY) | MIN(SALARY) | AVG(SALARY) |
++----------------+-------------+-------------+-------------+-------------+
+| RESEARCH       |      133000 |       40000 |       25000 |  33250.0000 |
+| ADMINISTRATION |       93000 |       43000 |       25000 |  31000.0000 |
+| HEADQUARTERS   |       55000 |       55000 |       55000 |  55000.0000 |
++----------------+-------------+-------------+-------------+-------------+
+3 rows in set (0.03 sec)
+
+mysql> #ALTER TABLE EMPLOYEE RENAME COLUMN FNAME TO FULLNAME;
+mysql> #ALTER TABLE DEPARTMENT ADD COLUMN STATUS VARCHAR(20) AFTER Mgr_Ssn;
+mysql> #ALTER TABLE EMPLOYEE MODIFY Address Varchar(100);
+mysql> #CREATE TABLE LAB5_Q1 AS (SELECT Dname, COUNT(*) FROM DEPARTMENT INNER JOIN EMPLOYEE ON DNUMBER = DNO  GROUP BY DNO HAVING AVG(SALARY) > 30000);
+mysql> ALTER TABLE DEPARTMENT ADD COLUMN STATUS VARCHAR(20) AFTER Mgr_Ssn;
+Query OK, 0 rows affected (0.17 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select fname from employee cross join project;
++----------+
+| fname    |
++----------+
+| John     |
+| John     |
+| John     |
+| John     |
+| John     |
+| John     |
+| Franklin |
+| Franklin |
+| Franklin |
+| Franklin |
+| Franklin |
+| Franklin |
+| Alicia   |
+| Alicia   |
+| Alicia   |
+| Alicia   |
+| Alicia   |
+| Alicia   |
+| Jennifer |
+| Jennifer |
+| Jennifer |
+| Jennifer |
+| Jennifer |
+| Jennifer |
+| Ramesh   |
+| Ramesh   |
+| Ramesh   |
+| Ramesh   |
+| Ramesh   |
+| Ramesh   |
+| Joyce    |
+| Joyce    |
+| Joyce    |
+| Joyce    |
+| Joyce    |
+| Joyce    |
+| Ahmad    |
+| Ahmad    |
+| Ahmad    |
+| Ahmad    |
+| Ahmad    |
+| Ahmad    |
+| James    |
+| James    |
+| James    |
+| James    |
+| James    |
+| James    |
++----------+
+48 rows in set (0.03 sec)

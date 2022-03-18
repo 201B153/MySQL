@@ -1,0 +1,916 @@
+
+Welcome to the MySQL monitor.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| company_201b153    |
+| information_schema |
+| mysql              |
+| mysql_practice_153 |
+| performance_schema |
+| sakila             |
+| sys                |
+| world              |
++--------------------+
+8 rows in set (0.20 sec)
+
+mysql> use mysql_practice_153;
+Database changed
+mysql> show tables;
++------------------------------+
+| Tables_in_mysql_practice_153 |
++------------------------------+
+| department                   |
+| dependent                    |
+| dept_locations               |
+| emp_dept                     |
+| employee                     |
+| project                      |
+| q1avg_sal                    |
+| works_on                     |
++------------------------------+
+8 rows in set (0.06 sec)
+
+mysql> create table emp as select fname,ssn,salary,dno from employee;
+Query OK, 8 rows affected (0.19 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> select * from emp;
++----------+-----------+--------+------+
+| fname    | ssn       | salary | dno  |
++----------+-----------+--------+------+
+| John     | 123456789 |  30000 |    5 |
+| Franklin | 333445555 |  40000 |    5 |
+| Alicia   | 999887777 |  25000 |    4 |
+| Jennifer | 987654321 |  43000 |    4 |
+| Ramesh   | 666884444 |  38000 |    5 |
+| Joyce    | 453453453 |  25000 |    5 |
+| Ahmad    | 987987987 |  25000 |    4 |
+| James    | 888665555 |  55000 |    1 |
++----------+-----------+--------+------+
+8 rows in set (0.05 sec)
+
+mysql> CREATE TABLE insert_tracking (
+    -> tracking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    -> field VARCHAR( 50 ) NOT NULL ,
+    -> new_value VARCHAR(20) NOT NULL ,
+    -> event_time DATETIME NOT NULL
+    -> );
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> CREATE TABLE delete_tracking (
+    -> tracking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    -> field VARCHAR( 50 ) NOT NULL ,
+    -> old_value VARCHAR(20) NOT NULL ,
+    -> event_time DATETIME NOT NULL
+    -> );
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> CREATE TABLE update_tracking (
+    -> tracking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    -> field VARCHAR( 50 ) NOT NULL ,
+    -> old_value VARCHAR(20) NOT NULL ,
+    -> new_value VARCHAR(20) NOT NULL ,
+    -> event_time DATETIME NOT NULL
+    -> );
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> desc delete_tracking;
++-------------+-------------+------+-----+---------+----------------+
+| Field       | Type        | Null | Key | Default | Extra          |
++-------------+-------------+------+-----+---------+----------------+
+| tracking_id | int         | NO   | PRI | NULL    | auto_increment |
+| field       | varchar(50) | NO   |     | NULL    |                |
+| old_value   | varchar(20) | NO   |     | NULL    |                |
+| event_time  | datetime    | NO   |     | NULL    |                |
++-------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.06 sec)
+
+mysql> CREATE TRIGGER insert_data AFTER UPDATE on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->         INSERT INTO insert_data (field, new_value, event_time) VALUES ("fname", NEW.fname, NOW());
+    ->         INSERT INTO insert_data (field, new_value, event_time) VALUES ("ssn", NEW.ssn, NOW());
+    ->         INSERT INTO insert_data (field, new_value, event_time) VALUES ("salary", NEW.salary, NOW());
+    ->         INSERT INTO insert_data (field, new_value, event_time) VALUES ("dno", NEW.dno, NOW());
+    -> END$
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> DELIMITER ;
+mysql> insert into emp values ("ram",111111111,25043,5);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> DELIMITER $
+
+mysql> CREATE TRIGGER update_data AFTER UPDATE on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->     IF (NEW.fname != OLD.fname) THEN
+    ->         INSERT INTO update_tracking(field, old_value, new_value, event_time) VALUES ("fname", OLD.fname, NEW.fname, NOW());
+    ->     END IF;
+    ->     IF (NEW.ssn != OLD.ssn) THEN
+    ->         INSERT INTO update_tracking (field, old_value, new_value, event_time, user) VALUES ("ssn", OLD.ssn, NEW.ssn, NOW());
+    ->     END IF;
+    ->     IF (NEW.salary != OLD.salary) THEN
+    ->         INSERT INTO update_tracking(field, old_value, new_value, event_time) VALUES ("salary", OLD.salary, NEW.salary, NOW());
+    ->     END IF;
+    ->     IF (NEW.dno != OLD.dno) THEN
+    ->         INSERT INTO update_tracking(field, old_value, new_value, event_time) VALUES ("dno", OLD.dno, NEW.dno, NOW());
+    ->     END IF;
+    -> END$
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TRIGGER delete_data AFTER DELETE on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->         INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("fname", OLD.fname, NOW());
+    ->         INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("ssn", OLD.ssn, NOW());
+    ->         INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("salary", OLD.salary, NOW());
+    ->         INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("dno", OLD.dno, NOW());
+    -> END$
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> DELIMITER ;
+mysql> delete from emp where ssn = 111111111;
+Query OK, 1 row affected (0.06 sec)
+
+mysql> select * from insert_tracking;
+Empty set (0.05 sec)
+
+mysql> DELIMITER $
+mysql> DROP TRIGGER delete_data $
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> CREATE TRIGGER delete_data AFTER DELETE on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->         INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("fname", OLD.fname, NOW());
+    ->         INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("ssn", OLD.ssn, NOW());
+    ->         INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("salary", OLD.salary, NOW());
+    ->         INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("dno", OLD.dno, NOW());
+    -> END$
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> DELIMITER ;
+mysql> delete from emp where ssn = 111111111;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> select * from delete_tracking;\
++-------------+--------+-----------+---------------------+
+| tracking_id | field  | old_value | event_time          |
++-------------+--------+-----------+---------------------+
+|           1 | fname  | ram       | 2021-12-22 21:47:52 |
+|           2 | ssn    | 111111111 | 2021-12-22 21:47:52 |
+|           3 | salary | 25043     | 2021-12-22 21:47:52 |
+|           4 | dno    | 5         | 2021-12-22 21:47:52 |
++-------------+--------+-----------+---------------------+
+4 rows in set (0.03 sec)
+
+mysql> DELIMITER $
+mysql> DROP TRIGGER insert_data $
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE TRIGGER insert_data AFTER UPDATE on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->         INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("fname", NEW.fname, NOW());
+    ->         INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("ssn", NEW.ssn, NOW());
+    ->         INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("salary", NEW.salary, NOW());
+    ->         INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("dno", NEW.dno, NOW());
+    -> END$
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> DELIMITER ;
+
+mysql> insert into emp values ('ram',111111111,25043,5);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from insert_tracking;
+Empty set (0.00 sec)
+
+mysql> DELIMITER $
+mysql> DROP TRIGGER insert_data $
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> CREATE TRIGGER insert_data AFTER INSERT on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->         INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("fname", NEW.fname, NOW());
+    ->         INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("ssn", NEW.ssn, NOW());
+    ->         INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("salary", NEW.salary, NOW());
+    ->         INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("dno", NEW.dno, NOW());
+    -> END$
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> DELIMITER ;
+mysql> insert into emp values("ram",111111111,25043,5);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from insert_tracking;
++-------------+--------+-----------+---------------------+
+| tracking_id | field  | new_value | event_time          |
++-------------+--------+-----------+---------------------+
+|           1 | fname  | ram       | 2021-12-22 22:00:04 |
+|           2 | ssn    | 111111111 | 2021-12-22 22:00:04 |
+|           3 | salary | 25043     | 2021-12-22 22:00:04 |
+|           4 | dno    | 5         | 2021-12-22 22:00:04 |
++-------------+--------+-----------+---------------------+
+4 rows in set (0.00 sec)
+
+mysql> select ssn, fname,dno, dname from employee inner join department on dno=dnumber;
++-----------+----------+------+----------------+
+| ssn       | fname    | dno  | dname          |
++-----------+----------+------+----------------+
+| 123456789 | John     |    5 | RESEARCH       |
+| 333445555 | Franklin |    5 | RESEARCH       |
+| 999887777 | Alicia   |    4 | ADMINISTRATION |
+| 987654321 | Jennifer |    4 | ADMINISTRATION |
+| 666884444 | Ramesh   |    5 | RESEARCH       |
+| 453453453 | Joyce    |    5 | RESEARCH       |
+| 987987987 | Ahmad    |    4 | ADMINISTRATION |
+| 888665555 | James    |    1 | HEADQUARTERS   |
++-----------+----------+------+----------------+
+8 rows in set (0.06 sec)
+
+mysql> select dname, dno, mgr_start_date, mgr_ssn ,fname, lname, bdate from employee inner join department on mgr_ssn=ssn;
++----------------+------+----------------+-----------+----------+---------+------------+
+| dname          | dno  | mgr_start_date | mgr_ssn   | fname    | lname   | bdate      |
++----------------+------+----------------+-----------+----------+---------+------------+
+| RESEARCH       |    5 | 1988-05-22     | 333445555 | Franklin | wong    | 1955-12-08 |
+| ADMINISTRATION |    4 | 1995-01-01     | 987654321 | Jennifer | Wallace | 1962-09-15 |
+| HEADQUARTERS   |    1 | 1981-06-19     | 888665555 | James    | Borg    | 1937-11-10 |
++----------------+------+----------------+-----------+----------+---------+------------+
+3 rows in set (0.00 sec)
+
+mysql> select dname,count(*) from employee inner join department on dno=dnumber group by dno;
++----------------+----------+
+| dname          | count(*) |
++----------------+----------+
+| RESEARCH       |        4 |
+| ADMINISTRATION |        3 |
+| HEADQUARTERS   |        1 |
++----------------+----------+
+3 rows in set (0.05 sec)
+
+mysql> select e.fname,e.ssn,e.dno from employee e inner join employee m on e.dno=m.dno where e.dno=(select dno from employee where fname='joyce') and m.fname!='joyce';
++----------+-----------+------+
+| fname    | ssn       | dno  |
++----------+-----------+------+
+| Joyce    | 453453453 |    5 |
+| Ramesh   | 666884444 |    5 |
+| Franklin | 333445555 |    5 |
+| John     | 123456789 |    5 |
+| Joyce    | 453453453 |    5 |
+| Ramesh   | 666884444 |    5 |
+| Franklin | 333445555 |    5 |
+| John     | 123456789 |    5 |
+| Joyce    | 453453453 |    5 |
+| Ramesh   | 666884444 |    5 |
+| Franklin | 333445555 |    5 |
+| John     | 123456789 |    5 |
++----------+-----------+------+
+12 rows in set (0.04 sec)
+
+mysql> select * from employee right join department on dno=dnumber;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------------+---------+-----------+--------+----------------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_Ssn | Dno  | Dname          | Dnumber | Mgr_Ssn   | STATUS | Mgr_start_date |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------------+---------+-----------+--------+----------------+
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5361 rice   houston, Tx  | f    |  25000 | 333445555 |    5 | RESEARCH       |       5 | 333445555 | NULL   | 1988-05-22     |
+| Ramesh   | K     | Narayan | 666884444 | 1968-01-19 | 975 fire oak  humble, Tx | m    |  38000 | 333445555 |    5 | RESEARCH       |       5 | 333445555 | NULL   | 1988-05-22     |
+| Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx     | m    |  40000 | 888665555 |    5 | RESEARCH       |       5 | 333445555 | NULL   | 1988-05-22     |
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731-foundren Houston, Tx | m    |  30000 | 333445555 |    5 | RESEARCH       |       5 | 333445555 | NULL   | 1988-05-22     |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 dallas  Houston, Tx  | m    |  25000 | 987654321 |    4 | ADMINISTRATION |       4 | 987654321 | NULL   | 1995-01-01     |
+| Jennifer | S     | Wallace | 987654321 | 1962-09-15 | 291 berry bellaire, Tx   | F    |  43000 | 888665555 |    4 | ADMINISTRATION |       4 | 987654321 | NULL   | 1995-01-01     |
+| Alicia   | J     | Zelaya  | 999887777 | 1941-06-20 | 321 castie spring, Tx    | F    |  25000 | 987654321 |    4 | ADMINISTRATION |       4 | 987654321 | NULL   | 1995-01-01     |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450  stone  Houston, Tx  | m    |  55000 |      NULL |    1 | HEADQUARTERS   |       1 | 888665555 | NULL   | 1981-06-19     |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------------+---------+-----------+--------+----------------+
+8 rows in set (0.00 sec)
+
+mysql> use company_201b153;
+Database changed
+
+mysql> CREATE TABLE customer (
+    ->   ID INT NOT NULL AUTO_INCREMENT,
+    ->   Name varchar(50) NOT NULL,
+    ->   City varchar(50) NOT NULL,
+    ->   PRIMARY KEY (ID)
+    ->
+    -> ^C
+mysql> show tables;
++-----------------------------+
+| Tables_in_company_201b154_1 |
++-----------------------------+
+| data_tracking               |
+| data_tracking_emp           |
+| department                  |
+| dependent                   |
+| dept_locations              |
+| emp                         |
+| emp1                        |
+| emp_dept                    |
+| emp_tracking                |
+| employee                    |
+| parent                      |
+| project                     |
+| works_on                    |
++-----------------------------+
+13 rows in set (0.00 sec)
+
+mysql> select * from data_tracking;
+Empty set (0.02 sec)
+
+mysql> use company_201b154;
+Database changed
+mysql> show tables;
++---------------------------+
+| Tables_in_company_201b154 |
++---------------------------+
+| department                |
+| employee                  |
++---------------------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from employee;
++----------+------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname    | mint | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | SuperSsn  | Dno  |
++----------+------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| John     | B    | Smith   | 123456789 | 1965-01-09 | 731 Foundron Houston, TX | M    |  30000 | 333445555 |    5 |
+| Franklin | T    | Wong    | 333445555 | 1955-12-09 | 638 Voss,Houston, TX     | M    |  40000 | 888665555 |    5 |
+| Arica    | J    | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle,Sprig ,TX    | M    |  25000 | 987654321 |    4 |
+| Jennifer | S    | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire,TX   | F    |  43000 | 888665555 |    4 |
+| Joyce    | A    | English | 453453453 | 1972-07-31 | 5631 Rice,Houston,TX     | F    |  25000 | 333445555 |    5 |
+| Ahemad   | V    | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas,Houston, TX   | M    |  25000 | 987654321 |    4 |
+| James    | E    | Bong    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    |  25000 |      NULL |    1 |
+| Ramesh   | K    | Narayam | 666884444 | 1962-09-15 | 975 Fire Oak,Humble,TX   | M    |  38000 | 333445555 |    5 |
++----------+------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+8 rows in set (0.02 sec)
+
+mysql> select * from data_tracking_emp;
+Empty set (0.02 sec)
+
+mysql> drop tables data_tracking;
+Query OK, 0 rows affected (0.32 sec)
+
+mysql> drop tables data_tracking_emp;
+Query OK, 0 rows affected (0.36 sec)
+
+mysql> CREATE TABLE customer (
+    ->   ID INT NOT NULL AUTO_INCREMENT,
+    ->   Name varchar(50) NOT NULL,
+    ->   City varchar(50) NOT NULL,
+    ->   PRIMARY KEY (ID)
+    -> );
+Query OK, 0 rows affected (0.30 sec)
+
+mysql> CREATE TABLE contact (
+    ->   ID INT,
+    ->   Customer_Id INT,
+    ->   Customer_Info varchar(50) NOT NULL,
+    ->   Type varchar(50) NOT NULL,
+    ->   INDEX par_ind (Customer_Id),
+    ->   CONSTRAINT fk_customer FOREIGN KEY (Customer_Id)
+    ->   REFERENCES customer(ID)
+    ->   ON DELETE CASCADE
+    ->   ON UPDATE CASCADE
+    -> );
+Query OK, 0 rows affected (0.83 sec)
+
+mysql> INSERT INTO customer(Name, City) VALUES
+    -> ('Joseph', 'California'),
+    -> ('Mary', 'NewYork'),
+    -> ('John', 'Alaska');
+Query OK, 3 rows affected (0.10 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO contact (Customer_Id, Customer_Info, Type) VALUES
+    -> (1, 'Joseph@javatpoint.com', 'email'),
+    -> (1, '121-121-121', 'work' ),
+    -> (1, '123-123-123', 'home'),
+    -> (2, 'Mary@javatpoint.com', 'email'),
+    -> (2, 'Mary@javatpoint.com', 'email'),
+    -> (2, '212-212-212', 'work'),
+    -> (3, 'John@javatpoint.com', 'email'),
+    -> (3, '313-313-313', 'home')
+    ->
+    -> ^C
+mysql> INSERT INTO contact (Customer_Id, Customer_Info, Type) VALUES
+    -> (1, 'Joseph@javatpoint.com', 'email'),
+    -> (1, '121-121-121', 'work' ),
+    -> (1, '123-123-123', 'home'),
+    -> (2, 'Mary@javatpoint.com', 'email'),
+    -> (2, 'Mary@javatpoint.com', 'email'),
+    -> (2, '212-212-212', 'work'),
+    -> (3, 'John@javatpoint.com', 'email'),
+    -> (3, '313-313-313', 'home');
+Query OK, 8 rows affected (0.08 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> show tables;
++-----------------------------+
+| Tables_in_company_201b154_1 |
++-----------------------------+
+| contact                     |
+| customer                    |
+| department                  |
+| dependent                   |
+| dept_locations              |
+| emp                         |
+| emp1                        |
+| emp_dept                    |
+| emp_tracking                |
+| employee                    |
+| parent                      |
+| project                     |
+| works_on                    |
++-----------------------------+
+13 rows in set (0.01 sec)
+
+mysql> select * from contact;
++------+-------------+-----------------------+-------+
+| ID   | Customer_Id | Customer_Info         | Type  |
++------+-------------+-----------------------+-------+
+| NULL |           1 | Joseph@javatpoint.com | email |
+| NULL |           1 | 121-121-121           | work  |
+| NULL |           1 | 123-123-123           | home  |
+| NULL |           2 | Mary@javatpoint.com   | email |
+| NULL |           2 | Mary@javatpoint.com   | email |
+| NULL |           2 | 212-212-212           | work  |
+| NULL |           3 | John@javatpoint.com   | email |
+| NULL |           3 | 313-313-313           | home  |
++------+-------------+-----------------------+-------+
+8 rows in set (0.00 sec)
+
+mysql> select * from customer;
++----+--------+------------+
+| ID | Name   | City       |
++----+--------+------------+
+|  1 | Joseph | California |
+|  2 | Mary   | NewYork    |
+|  3 | John   | Alaska     |
++----+--------+------------+
+3 rows in set (0.00 sec)
+
+mysql> DELETE FROM customer WHERE Name='John';
+Query OK, 1 row affected (0.08 sec)
+
+mysql> select * from customer;
++----+--------+------------+
+| ID | Name   | City       |
++----+--------+------------+
+|  1 | Joseph | California |
+|  2 | Mary   | NewYork    |
++----+--------+------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from contact;
++------+-------------+-----------------------+-------+
+| ID   | Customer_Id | Customer_Info         | Type  |
++------+-------------+-----------------------+-------+
+| NULL |           1 | Joseph@javatpoint.com | email |
+| NULL |           1 | 121-121-121           | work  |
+| NULL |           1 | 123-123-123           | home  |
+| NULL |           2 | Mary@javatpoint.com   | email |
+| NULL |           2 | Mary@javatpoint.com   | email |
+| NULL |           2 | 212-212-212           | work  |
++------+-------------+-----------------------+-------+
+6 rows in set (0.00 sec)
+
+mysql> select * from emp;
+Empty set (0.06 sec)
+
+mysql> select * from emp1;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | address                  | sex  | Salary | Super_Ssn | Dno  |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houstan, TX | M    |  30000 | 333445555 |    5 |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houstan, TX    | M    |  40000 | 888665555 |    5 |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    |  25000 | 987654321 |    4 |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    |  43000 | 888665555 |    4 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    |  38000 | 333445555 |    5 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    |  25000 | 333445555 |    5 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    |  25000 | 987654321 |    4 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    |  55000 |      NULL |    1 |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+8 rows in set (0.02 sec)
+
+mysql> select * from employee;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | address                  | sex  | Salary | Super_Ssn | Dno  |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houstan, TX | M    |  30000 | 333445555 |    5 |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houstan, TX    | M    |  40000 | 888665555 |    5 |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    |  25000 | 987654321 |    4 |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    |  43000 | 888665555 |    4 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    |  38000 | 333445555 |    5 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    |  25000 | 333445555 |    5 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    |  25000 | 987654321 |    4 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    |  55000 |      NULL |    1 |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+8 rows in set (0.02 sec)
+
+mysql> drop table emp1;
+Query OK, 0 rows affected (0.41 sec)
+
+mysql> drop table emp;
+Query OK, 0 rows affected (0.22 sec)
+
+mysql> show tables;
++-----------------------------+
+| Tables_in_company_201b154_1 |
++-----------------------------+
+| contact                     |
+| customer                    |
+| department                  |
+| dependent                   |
+| dept_locations              |
+| emp_dept                    |
+| emp_tracking                |
+| employee                    |
+| parent                      |
+| project                     |
+| works_on                    |
++-----------------------------+
+11 rows in set (0.01 sec)
+
+mysql> select * from emp_dept;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------------+---------+-----------+----------------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | address                  | sex  | Salary | Super_Ssn | Dno  | Dname          | Dnumber | Mgr_ssn   | Mgr_start_date |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------------+---------+-----------+----------------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731 Fondren, Houstan, TX | M    |  30000 | 333445555 |    5 | Research       |       5 | 333445555 | 1988-05-22     |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638 Voss, Houstan, TX    | M    |  40000 | 888665555 |    5 | Research       |       5 | 333445555 | 1988-05-22     |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321 Castle, Spring, TX  | F    |  25000 | 987654321 |    4 | Administration |       4 | 987654321 | 1995-01-01     |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291 Berry, Bellaire, TX  | F    |  43000 | 888665555 |    4 | Administration |       4 | 987654321 | 1995-01-01     |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975 Fire Oak, Humble, TX | M    |  38000 | 333445555 |    5 | Research       |       5 | 333445555 | 1988-05-22     |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631 Rice, Houston, TX   | F    |  25000 | 333445555 |    5 | Research       |       5 | 333445555 | 1988-05-22     |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 Dallas, Houston, TX  | M    |  25000 | 987654321 |    4 | Administration |       4 | 987654321 | 1995-01-01     |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450 Stone, Houston, TX   | M    |  55000 |      NULL |    1 | Headquarters   |       1 | 888665555 | 1981-06-19     |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+----------------+---------+-----------+----------------+
+8 rows in set (0.04 sec)
+
+mysql> CREATE TABLE data_tracking (
+    -> tracking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    -> field VARCHAR( 50 ) NOT NULL ,
+    -> old_value VARCHAR(20) NOT NULL ,
+    -> new_value VARCHAR(20) NOT NULL ,
+    -> event_time DATETIME NOT NULL,
+    -> user VARCHAR(20)
+    -> );
+Query OK, 0 rows affected (0.30 sec)
+
+mysql> create table emp as select fname ,ssn, salary,dno from employee;
+Query OK, 8 rows affected (0.28 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> desc emp;
++--------+---------------+------+-----+---------+-------+
+| Field  | Type          | Null | Key | Default | Extra |
++--------+---------------+------+-----+---------+-------+
+| fname  | varchar(20)   | YES  |     | NULL    |       |
+| ssn    | decimal(10,0) | YES  |     | NULL    |       |
+| salary | decimal(10,0) | YES  |     | NULL    |       |
+| dno    | int           | YES  |     | NULL    |       |
++--------+---------------+------+-----+---------+-------+
+4 rows in set (0.04 sec)
+
+mysql> select * from emp;
++----------+-----------+--------+------+
+| fname    | ssn       | salary | dno  |
++----------+-----------+--------+------+
+| John     | 123456789 |  30000 |    5 |
+| Franklin | 333445555 |  40000 |    5 |
+| Alicia   | 999887777 |  25000 |    4 |
+| Jennifer | 987654321 |  43000 |    4 |
+| Ramesh   | 666884444 |  38000 |    5 |
+| Joyce    | 453453453 |  25000 |    5 |
+| Ahmad    | 987987987 |  25000 |    4 |
+| James    | 888665555 |  55000 |    1 |
++----------+-----------+--------+------+
+8 rows in set (0.00 sec)
+
+############################To Create diract TRIGGER paste it##########################################################
+
+#####################EMP_Table#########################################################
+mysql> CREATE TABLE emp AS select fname,ssn,salary,dno from employee;
+mysql> desc emp;
++--------+--------------+------+-----+---------+-------+
+| Field  | Type         | Null | Key | Default | Extra |
++--------+--------------+------+-----+---------+-------+
+| fname  | varchar(10)  | NO   |     | NULL    |       |
+| ssn    | char(9)      | NO   | PRI | NULL    |       |
+| salary | decimal(5,0) | YES  |     | NULL    |       |
+| dno    | int          | NO   |     | NULL    |       |
++--------+--------------+------+-----+---------+-------+
+#################LOG_TABLES_FOR TRIGER########################################
+CREATE TABLE insert_tracking (
+tracking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+field VARCHAR( 50 ) NOT NULL ,
+new_value VARCHAR(20) NOT NULL ,
+event_time DATETIME NOT NULL
+); 
+CREATE TABLE delete_tracking (
+tracking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+field VARCHAR( 50 ) NOT NULL ,
+old_value VARCHAR(20) NOT NULL ,
+event_time DATETIME NOT NULL
+); 
+CREATE TABLE update_tracking (
+tracking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+field VARCHAR( 50 ) NOT NULL ,
+old_value VARCHAR(20) NOT NULL ,
+new_value VARCHAR(20) NOT NULL ,
+event_time DATETIME NOT NULL
+); 
+###########Trigger Syntax #############################################################
+CREATE TRIGGER <trigger name> BEFORE INSERT
+ON <table name>
+FOR EACH ROW
+<trigger body>;
+############################################INSERT_TRIGGER############################
+DELIMITER $
+DROP TRIGGER insert_data $
+CREATE TRIGGER insert_data AFTER INSERT on emp
+FOR EACH ROW
+BEGIN
+        INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("fname", NEW.fname, NOW());
+        INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("ssn", NEW.ssn, NOW());
+        INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("salary", NEW.salary, NOW());  
+        INSERT INTO insert_tracking (field, new_value, event_time) VALUES ("dno", NEW.dno, NOW());
+END$
+DELIMITER ;
+insert into emp values("ram",111111111,25043,5);
+############################DELETE_TRIGGER######################################
+DELIMITER $
+DROP TRIGGER delete_data $
+CREATE TRIGGER delete_data AFTER DELETE on emp
+FOR EACH ROW
+BEGIN
+        INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("fname", OLD.fname, NOW());
+        INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("ssn", OLD.ssn, NOW());
+        INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("salary", OLD.salary, NOW());
+        INSERT INTO delete_tracking(field, old_value,event_time) VALUES ("dno", OLD.dno, NOW());
+END$
+DELIMITER ;
+delete from emp where ssn = 111111111;
+##################UPDATE_TRIGGER#############################################
+DELIMITER $
+DROP TRIGGER update_data $
+CREATE TRIGGER update_data AFTER UPDATE on emp
+FOR EACH ROW
+BEGIN
+    IF (NEW.fname != OLD.fname) THEN
+        INSERT INTO update_tracking(field, old_value, new_value, event_time) VALUES ("fname", OLD.fname, NEW.fname, NOW());
+    END IF;  
+    IF (NEW.ssn != OLD.ssn) THEN
+        INSERT INTO update_tracking (field, old_value, new_value, event_time, user) VALUES ("ssn", OLD.ssn, NEW.ssn, NOW());
+    END IF;  
+    IF (NEW.salary != OLD.salary) THEN
+        INSERT INTO update_tracking(field, old_value, new_value, event_time) VALUES ("salary", OLD.salary, NEW.salary, NOW());
+    END IF;   
+    IF (NEW.dno != OLD.dno) THEN
+        INSERT INTO update_tracking(field, old_value, new_value, event_time) VALUES ("dno", OLD.dno, NEW.dno, NOW());
+    END IF;
+END$
+DELIMITER ;
+update emp set fname="ramesh" where ssn=123456789;
+########################TRIGGER_EITH_IT's_BODY######################
+delimiter |
+CREATE TRIGGER testref BEFORE INSERT ON test1
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO test2 SET a2 = NEW.a1;
+    DELETE FROM test3 WHERE a3 = NEW.a1;
+    UPDATE test4 SET b4 = b4 + 1 WHERE a4 = NEW.a1;
+  END;
+|
+
+delimiter ;
+######################################################################
+###################CHECK_OF_UPDATE_TRACKING###########################
+Insert into emp values('nilesh',127567363,50000, 1) ;
+Insert into emp (ssn,name,dno) values (123345356, ‘ajay’,2);
+delete from emp where fname='ajay';
+
+
+###############################################################################
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+mysql> desc emp;
++--------+--------------+------+-----+---------+-------+
+| Field  | Type         | Null | Key | Default | Extra |
++--------+--------------+------+-----+---------+-------+
+| fname  | varchar(10)  | YES  |     | NULL    |       |
+| ssn    | decimal(9,0) | YES  |     | NULL    |       |
+| salary | decimal(9,0) | YES  |     | NULL    |       |
+| dno    | decimal(2,0) | YES  |     | NULL    |       |
++--------+--------------+------+-----+---------+-------+
+4 rows in set (0.03 sec)
+
+mysql> CREATE TABLE insert_tracking (
+    -> tracking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    -> field VARCHAR( 50 ) NOT NULL ,
+    -> new_value VARCHAR(20) NOT NULL ,
+    -> event_time DATETIME NOT NULL
+    -> );
+Query OK, 0 rows affected (0.39 sec)
+
+mysql> CREATE TABLE delete_tracking (
+    -> tracking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    -> field VARCHAR( 50 ) NOT NULL ,
+    -> old_value VARCHAR(20) NOT NULL ,
+    -> event_time DATETIME NOT NULL
+    -> );
+Query OK, 0 rows affected (0.76 sec)
+
+mysql> desc delete_tracking;
++-------------+-------------+------+-----+---------+----------------+
+| Field       | Type        | Null | Key | Default | Extra          |
++-------------+-------------+------+-----+---------+----------------+
+| tracking_id | int         | NO   | PRI | NULL    | auto_increment |
+| field       | varchar(50) | NO   |     | NULL    |                |
+| old_value   | varchar(20) | NO   |     | NULL    |                |
+| event_time  | datetime    | NO   |     | NULL    |                |
++-------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.02 sec)
+
+mysql> desc insert_tracking;
++-------------+-------------+------+-----+---------+----------------+
+| Field       | Type        | Null | Key | Default | Extra          |
++-------------+-------------+------+-----+---------+----------------+
+| tracking_id | int         | NO   | PRI | NULL    | auto_increment |
+| field       | varchar(50) | NO   |     | NULL    |                |
+| new_value   | varchar(20) | NO   |     | NULL    |                |
+| event_time  | datetime    | NO   |     | NULL    |                |
++-------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc update_tracking;
++-------------+-------------+------+-----+---------+----------------+
+| Field       | Type        | Null | Key | Default | Extra          |
++-------------+-------------+------+-----+---------+----------------+
+| tracking_id | int         | NO   | PRI | NULL    | auto_increment |
+| field       | varchar(50) | NO   |     | NULL    |                |
+| old_value   | varchar(20) | NO   |     | NULL    |                |
+| new_value   | varchar(20) | NO   |     | NULL    |                |
+| event_time  | datetime    | NO   |     | NULL    |                |
++-------------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> DELIMITER $
+mysql> DROP TRIGGER update_data $
+ERROR 1360 (HY000): Trigger does not exist
+mysql> CREATE TRIGGER update_data AFTER UPDATE on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->     IF (NEW.fname != OLD.fname) THEN
+    ->         INSERT INTO data_tracking (field, old_value, new_value, event_time,user) VALUES ("fname", OLD.fname, NEW.fname, NOW(), user());
+    ->     END IF;
+    ->     IF (NEW.ssn != OLD.ssn) THEN
+    ->         INSERT INTO data_tracking (field, old_value, new_value, event_time, user) VALUES ("ssn", OLD.ssn, NEW.ssn, NOW(),user());
+    ->     END IF;
+    ->     IF (NEW.salary != OLD.salary) THEN
+    ->         INSERT INTO data_tracking (field, old_value, new_value, event_time,user) VALUES ("salary", OLD.salary, NEW.salary, NOW(),user());
+    ->     END IF;
+    ->     IF (NEW.dno != OLD.dno) THEN
+    ->         INSERT INTO data_tracking (field, old_value, new_value, event_time, user) VALUES ("dno", OLD.dno, NEW.dno, NOW(),user());
+    ->     END IF;
+    -> END$
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> DELIMITER ;
+mysql> show triggers;
++-------------+--------+-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------------------+--------------------------------------------+----------------+----------------------+----------------------+--------------------+
+| Trigger     | Event  | Table | Statement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Timing | Created                | sql_mode                                   | Definer        | character_set_client | collation_connection | Database Collation |
++-------------+--------+-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------------------+--------------------------------------------+----------------+----------------------+----------------------+--------------------+
+| update_data | UPDATE | emp   | BEGIN
+    IF (NEW.fname != OLD.fname) THEN
+        INSERT INTO data_tracking (field, old_value, new_value, event_time,user) VALUES ("fname", OLD.fname, NEW.fname, NOW(), user());
+    END IF;
+    IF (NEW.ssn != OLD.ssn) THEN
+        INSERT INTO data_tracking (field, old_value, new_value, event_time, user) VALUES ("ssn", OLD.ssn, NEW.ssn, NOW(),user());
+    END IF;
+    IF (NEW.salary != OLD.salary) THEN
+        INSERT INTO data_tracking (field, old_value, new_value, event_time,user) VALUES ("salary", OLD.salary, NEW.salary, NOW(),user());
+    END IF;
+    IF (NEW.dno != OLD.dno) THEN
+        INSERT INTO data_tracking (field, old_value, new_value, event_time, user) VALUES ("dno", OLD.dno, NEW.dno, NOW(),user());
+    END IF;
+END | AFTER  | 2021-12-09 12:28:33.62 | STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION | root@localhost | cp850                | cp850_general_ci     | utf8mb4_0900_ai_ci |
++-------------+--------+-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------------------+--------------------------------------------+----------------+----------------------+----------------------+--------------------+
+1 row in set (0.05 sec)
+
+mysql> DELIMITER $
+mysql> DROP TRIGGER delete_data $
+ERROR 1360 (HY000): Trigger does not exist
+mysql> CREATE TRIGGER delete_data AFTER DELETE on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->     IF (NEW.fname != OLD.fname) THEN
+    ->         INSERT INTO delete_tracking (field, old_value, event_time) VALUES ("fname", OLD.fname, NOW() );
+    ->     END IF;
+    ->     IF (NEW.ssn != OLD.ssn) THEN
+    ->         INSERT INTO delete_tracking(field, old_value,  event_time) VALUES ("ssn", OLD.ssn, NOW());
+    ->     END IF;
+    ->     IF (NEW.salary != OLD.salary) THEN
+    ->         INSERT INTO delete_tracking(field, old_value, event_time) VALUES ("salary", OLD.salary, NOW());
+    ->     END IF;
+    ->     IF (NEW.dno != OLD.dno) THEN
+    ->         INSERT INTO delete_tracking(field, old_value,  event_time) VALUES ("dno", OLD.dno, NOW());
+    ->     END IF;
+    -> END$
+ERROR 1363 (HY000): There is no NEW row in on DELETE trigger
+mysql> DELIMITER ;
+mysql> DELIMITER $
+mysql> DROP TRIGGER delete_data $
+ERROR 1360 (HY000): Trigger does not exist
+mysql> CREATE TRIGGER delete_data AFTER DELETE on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->     IF (OLD.fname) THEN
+    ->         INSERT INTO delete_tracking (field, old_value, event_time) VALUES ("fname", OLD.fname, NOW() );
+    ->     END IF;
+    ->     IF (OLD.ssn) THEN
+    ->         INSERT INTO delete_tracking(field, old_value,  event_time) VALUES ("ssn", OLD.ssn, NOW());
+    ->     END IF;
+    ->     IF (OLD.salary) THEN
+    ->         INSERT INTO delete_tracking(field, old_value, event_time) VALUES ("salary", OLD.salary, NOW());
+    ->     END IF;
+    ->     IF (OLD.dno) THEN
+    ->         INSERT INTO delete_tracking(field, old_value,  event_time) VALUES ("dno", OLD.dno, NOW());
+    ->     END IF;
+    -> END$
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> DELIMITER ;
+mysql> DELIMITER $
+mysql> DROP TRIGGER insert_data $
+ERROR 1360 (HY000): Trigger does not exist
+mysql> CREATE TRIGGER insert_data AFTER UPDATE on emp
+    -> FOR EACH ROW
+    -> BEGIN
+    ->     IF (NEW.fname) THEN
+    ->         INSERT INTO insert_data (field, new_value, event_time) VALUES ("fname", NEW.fname, NOW());
+    ->     END IF;
+    ->     IF (NEW.ssn) THEN
+    ->         INSERT INTO insert_data (field, new_value, event_time) VALUES ("ssn", NEW.ssn, NOW());
+    ->     END IF;
+    ->     IF (NEW.salary) THEN
+    ->         INSERT INTO insert_data (field, new_value, event_time) VALUES ("salary", NEW.salary, NOW());
+    ->     END IF;
+    ->     IF (NEW.dno) THEN
+    ->         INSERT INTO insert_data (field, new_value, event_time) VALUES ("dno", NEW.dno, NOW());
+    ->     END IF;
+    -> END$
+Query OK, 0 rows affected (0.16 sec)
+
+mysql> DELIMITER ;
+mysql> show triggers;
++-------------+--------+-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------------------+--------------------------------------------+----------------+----------------------+----------------------+--------------------+
+| Trigger     | Event  | Table | Statement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Timing | Created                | sql_mode                                   | Definer        | character_set_client | collation_connection | Database Collation |
++-------------+--------+-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------------------+--------------------------------------------+----------------+----------------------+----------------------+--------------------+
+| update_data | UPDATE | emp   | BEGIN
+    IF (NEW.fname != OLD.fname) THEN
+        INSERT INTO data_tracking (field, old_value, new_value, event_time,user) VALUES ("fname", OLD.fname, NEW.fname, NOW(), user());
+    END IF;
+    IF (NEW.ssn != OLD.ssn) THEN
+        INSERT INTO data_tracking (field, old_value, new_value, event_time, user) VALUES ("ssn", OLD.ssn, NEW.ssn, NOW(),user());
+    END IF;
+    IF (NEW.salary != OLD.salary) THEN
+        INSERT INTO data_tracking (field, old_value, new_value, event_time,user) VALUES ("salary", OLD.salary, NEW.salary, NOW(),user());
+    END IF;
+    IF (NEW.dno != OLD.dno) THEN
+        INSERT INTO data_tracking (field, old_value, new_value, event_time, user) VALUES ("dno", OLD.dno, NEW.dno, NOW(),user());
+    END IF;
+END | AFTER  | 2021-12-09 12:28:33.62 | STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION | root@localhost | cp850                | cp850_general_ci     | utf8mb4_0900_ai_ci |
+| insert_data | UPDATE | emp   | BEGIN
+    IF (NEW.fname) THEN
+        INSERT INTO insert_data (field, new_value, event_time) VALUES ("fname", NEW.fname, NOW());
+    END IF;
+    IF (NEW.ssn) THEN
+        INSERT INTO insert_data (field, new_value, event_time) VALUES ("ssn", NEW.ssn, NOW());
+    END IF;
+    IF (NEW.salary) THEN
+        INSERT INTO insert_data (field, new_value, event_time) VALUES ("salary", NEW.salary, NOW());
+    END IF;
+    IF (NEW.dno) THEN
+        INSERT INTO insert_data (field, new_value, event_time) VALUES ("dno", NEW.dno, NOW());
+    END IF;
+END                                                                                                                                                                                                  | AFTER  | 2021-12-09 12:31:36.15 | STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION | root@localhost | cp850                | cp850_general_ci     | utf8mb4_0900_ai_ci |
+| delete_data | DELETE | emp   | BEGIN
+    IF (OLD.fname) THEN
+        INSERT INTO delete_tracking (field, old_value, event_time) VALUES ("fname", OLD.fname, NOW() );
+    END IF;
+    IF (OLD.ssn) THEN
+        INSERT INTO delete_tracking(field, old_value,  event_time) VALUES ("ssn", OLD.ssn, NOW());
+    END IF;
+    IF (OLD.salary) THEN
+        INSERT INTO delete_tracking(field, old_value, event_time) VALUES ("salary", OLD.salary, NOW());
+    END IF;
+    IF (OLD.dno) THEN
+        INSERT INTO delete_tracking(field, old_value,  event_time) VALUES ("dno", OLD.dno, NOW());
+    END IF;
+END                                                                                                                                                                                  | AFTER  | 2021-12-09 12:31:13.40 | STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION | root@localhost | cp850                | cp850_general_ci     | utf8mb4_0900_ai_ci |
++-------------+--------+-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------------------+--------------------------------------------+----------------+----------------------+----------------------+--------------------+
+3 rows in set (0.00 sec)
+

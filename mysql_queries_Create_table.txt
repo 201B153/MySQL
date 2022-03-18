@@ -1,0 +1,596 @@
+
+Welcome to the MySQL monitor.
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| companay_201b370   |
+| company_201b106    |
+| company_201b220    |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| world              |
++--------------------+
+9 rows in set (0.02 sec)
+
+mysql> CREATE DATABASE COMPANY_201B153;
+Query OK, 1 row affected (0.18 sec)
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| companay_201b370   |
+| company_201b106    |
+| company_201b153    |
+| company_201b220    |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| world              |
++--------------------+
+10 rows in set (0.00 sec)
+
+mysql> USE COMPANY_201B153;
+Database changed
+
+mysql>  CREATE TABLE EMPLOYEE(Fname  VARCHAR(10), Minit CHAR(1), Lname VARCHAR(10), Ssn NUMERIC(9), Bdate DATE, Address VARCHAR(255), Sex CHAR(2), Salary NUMERIC(9), Super_Ssn NUMERIC(9), Dno NUMERIC(2));
+Query OK, 0 rows affected (1.11 sec)
+
+mysql> SHOW TABLES;
++---------------------------+
+| Tables_in_company_201b153 |
++---------------------------+
+| employee                  |
++---------------------------+
+1 row in set (0.02 sec)
+
+mysql> DESC EMPLOYEE;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| Fname     | varchar(10)  | YES  |     | NULL    |       |
+| Minit     | char(1)      | YES  |     | NULL    |       |
+| Lname     | varchar(10)  | YES  |     | NULL    |       |
+| Ssn       | decimal(9,0) | YES  |     | NULL    |       |
+| Bdate     | date         | YES  |     | NULL    |       |
+| Address   | varchar(255) | YES  |     | NULL    |       |
+| Sex       | char(2)      | YES  |     | NULL    |       |
+| Salary    | decimal(9,0) | YES  |     | NULL    |       |
+| Super_Ssn | decimal(9,0) | YES  |     | NULL    |       |
+| Dno       | decimal(2,0) | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+10 rows in set (0.04 sec)
+
+mysql> INSERT INTO EMPLOYEE VALUES('John','B','Smith',123456789,'1965-01-09','731-foundren Houston, Tx','m',30000,333445555,5);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> SELECT * FROM EMPLOYEE;
++-------+-------+-------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname | Minit | Lname | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_Ssn | Dno  |
++-------+-------+-------+-----------+------------+--------------------------+------+--------+-----------+------+
+| John  | B     | Smith | 123456789 | 1965-01-09 | 731-foundren Houston, Tx | m    |  30000 | 333445555 |    5 |
++-------+-------+-------+-----------+------------+--------------------------+------+--------+-----------+------+
+1 row in set (0.02 sec)
+
+mysql> SELECT EMPLOYEE.Fname FROM EMPLOYEE;
++-------+
+| Fname |
++-------+
+| John  |
++-------+
+1 row in set (0.00 sec)
+
+mysql> INSERT INTO EMPLOYEE VALUES('Franklin','t','wong',333445555,'1955-12-08','638 voss Houston, Tx','m',40000,888665555,5);
+Query OK, 1 row affected (0.12 sec)
+
+mysql> INSERT INTO EMPLOYEE VALUES('Alicia','J','Zelaya',999887777,'1941-06-20','321 castie spring, Tx','F',25000,987654321,4);
+Query OK, 1 row affected (0.07 sec)
+
+mysql> INSERT INTO EMPLOYEE VALUES('Jennifer','S','Wallace',987654321,'1962-09-15','291 berry bellaire, Tx','F',43000,888665555,4);
+Query OK, 1 row affected (0.19 sec)
+
+mysql> INSERT INTO EMPLOYEE VALUES('Ramesh','K','Narayan',666884444,'1968-01-19','975 fire oak  humble, Tx','m',38000,333445555,5);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> INSERT INTO EMPLOYEE VALUES('Joyce','A','English',453453453,'1972-07-31','5361 rice   houston, Tx','f',25000,333445555,5);
+Query OK, 1 row affected (0.10 sec)
+
+mysql> INSERT INTO EMPLOYEE VALUES('Ahmad','V','Jabbar',987987987,'1969-03-29','980 dallas  Houston, Tx','m',25000,987654321,4);
+Query OK, 1 row affected (0.06 sec)
+
+mysql> INSERT INTO EMPLOYEE VALUES('James','E','Borg',888665555,'1937-11-10','450  stone  Houston, Tx','m',55000,NULL,1);
+Query OK, 1 row affected (0.11 sec)
+
+mysql> SELECT * FROM EMPLOYEE;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_Ssn | Dno  |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731-foundren Houston, Tx | m    |  30000 | 333445555 |    5 |
+| Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx     | m    |  40000 | 888665555 |    5 |
+| Alicia   | J     | Zelaya  | 999887777 | 1941-06-20 | 321 castie spring, Tx    | F    |  25000 | 987654321 |    4 |
+| Jennifer | S     | Wallace | 987654321 | 1962-09-15 | 291 berry bellaire, Tx   | F    |  43000 | 888665555 |    4 |
+| Ramesh   | K     | Narayan | 666884444 | 1968-01-19 | 975 fire oak  humble, Tx | m    |  38000 | 333445555 |    5 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5361 rice   houston, Tx  | f    |  25000 | 333445555 |    5 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 dallas  Houston, Tx  | m    |  25000 | 987654321 |    4 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450  stone  Houston, Tx  | m    |  55000 |      NULL |    1 |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT EMPLOYEE.minit FROM EMPLOYEE;
++-------+
+| minit |
++-------+
+| B     |
+| t     |
+| J     |
+| S     |
+| K     |
+| A     |
+| V     |
+| E     |
++-------+
+8 rows in set (0.00 sec)
+
+mysql> CREATE TABLE DEPARTMENT(Dname VARCHAR(20), Dnumber NUMERIC(2), Mgr_Ssn NUMERIC(9), Mgr_start_date DATE);
+Query OK, 0 rows affected (0.86 sec)
+
+mysql> SHOW TABLES;
++---------------------------+
+| Tables_in_company_201b153 |
++---------------------------+
+| department                |
+| employee                  |
++---------------------------+
+2 rows in set (0.03 sec)
+
+mysql> DESC DEPARTMENT;
++----------------+--------------+------+-----+---------+-------+
+| Field          | Type         | Null | Key | Default | Extra |
++----------------+--------------+------+-----+---------+-------+
+| Dname          | varchar(20)  | YES  |     | NULL    |       |
+| Dnumber        | decimal(2,0) | YES  |     | NULL    |       |
+| Mgr_Ssn        | decimal(9,0) | YES  |     | NULL    |       |
+| Mgr_start_date | date         | YES  |     | NULL    |       |
++----------------+--------------+------+-----+---------+-------+
+4 rows in set (0.02 sec)
+
+mysql> INSERT INTO DEPARTMENT VALUES('RESEARCH',5,333445555,'1988-05-22');
+Query OK, 1 row affected (0.05 sec)
+
+mysql> INSERT INTO DEPARTMENT VALUES('ADMINISTRATION',4,987654321,'1995-01-01');
+Query OK, 1 row affected (0.11 sec)
+
+mysql> INSERT INTO DEPARTMENT VALUES('HEADQUARTERS',1,888665555,'1981-06-19');
+Query OK, 1 row affected (0.06 sec)
+
+mysql> SELECT * FROM DEPARTMENT
+    -> ;
++----------------+---------+-----------+----------------+
+| Dname          | Dnumber | Mgr_Ssn   | Mgr_start_date |
++----------------+---------+-----------+----------------+
+| RESEARCH       |       5 | 333445555 | 1988-05-22     |
+| ADMINISTRATION |       4 | 987654321 | 1995-01-01     |
+| HEADQUARTERS   |       1 | 888665555 | 1981-06-19     |
++----------------+---------+-----------+----------------+
+3 rows in set (0.00 sec)
+
+mysql>   create table dependent(Essn int,Dependent_name varchar(20),Sex char(2),Bdate date,Relationship char(20));
+Query OK, 0 rows affected (0.09 sec)
+
+mysql>   insert into dependent values(123456789,'Alice','F','1988-12-30','Daughter');
+Query OK, 1 row affected (0.00 sec)
+
+mysql>   insert into dependent values(123456789,'michael','M','1988-01-04','Son');
+Query OK, 1 row affected (0.05 sec)
+
+mysql>   insert into dependent values(987654321,'Abner','M','1988-01-04','Spouse');
+Query OK, 1 row affected (0.01 sec)
+
+mysql>   insert into dependent values(333445555,'Joy','F','1958-05-03','Spouse');
+Query OK, 1 row affected (0.01 sec)
+
+mysql>   insert into dependent values(333445555,'Theodore','M','1983-10-25','Son');
+Query OK, 1 row affected (0.04 sec)
+
+mysql>   select * from dependent;
++-----------+----------------+------+------------+--------------+
+| Essn      | Dependent_name | Sex  | Bdate      | Relationship |
++-----------+----------------+------+------------+--------------+
+| 123456789 | Alice          | F    | 1988-12-30 | Daughter     |
+| 123456789 | michael        | M    | 1988-01-04 | Son          |
+| 987654321 | Abner          | M    | 1988-01-04 | Spouse       |
+| 333445555 | Joy            | F    | 1958-05-03 | Spouse       |
+| 333445555 | Theodore       | M    | 1983-10-25 | Son          |
++-----------+----------------+------+------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> CREATE TABLE DEPT_LOCATIONS(Dnumber NUMERIC(2), Dlocation VARCHAR(15));
+Query OK, 0 rows affected (0.93 sec)
+
+mysql> DESC DEPT_LOCATIONS
+    -> ;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| Dnumber   | decimal(2,0) | YES  |     | NULL    |       |
+| Dlocation | varchar(15)  | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+mysql> INSERT INTO DEPT_LOCATIONS VALUES(1,'Houston');
+Query OK, 1 row affected (0.07 sec)
+
+mysql> INSERT INTO DEPT_LOCATIONS VALUES(4,'Stafford');
+Query OK, 1 row affected (0.15 sec)
+
+mysql> INSERT INTO DEPT_LOCATIONS VALUES(5,'Bellaire');
+Query OK, 1 row affected (0.08 sec)
+
+mysql>  INSERT INTO DEPT_LOCATIONS VALUES(5,'Sugarland');
+Query OK, 1 row affected (0.11 sec)
+
+mysql>  INSERT INTO DEPT_LOCATIONS VALUES(5,'Houston');
+Query OK, 1 row affected (0.05 sec)
+
+mysql> SELECT * FROM DEPT_LOCATIONS;
++---------+-----------+
+| Dnumber | Dlocation |
++---------+-----------+
+|       1 | Houston   |
+|       4 | Stafford  |
+|       5 | Bellaire  |
+|       5 | Sugarland |
+|       5 | Houston   |
++---------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> CREATE TABLE WORKS_ON(Essn NUMERIC(2), Pno NUMERIC(2) ,Hours NUMERIC(5));
+Query OK, 0 rows affected (0.11 sec)
+
+mysql> alter table WORKS_ON
+    -> modify Essn numeric(9);
+Query OK, 0 rows affected (0.14 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO WORKS_ON VALUES(123456789,1,32.5);
+Query OK, 1 row affected, 1 warning (0.05 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(123456789,2,7.5);
+Query OK, 1 row affected, 1 warning (0.05 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES( 666884444,3,40);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(453453453,1,20);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(453453453,2,20);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(333445555,2,10);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(333445555,3,10);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(333445555,10,10);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(333445555,20,10);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(999887777,30,30);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(999887777,10,10);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(987987987,10,35);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(987987987,30,5);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(987654321,30,20);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(987654321,20,15);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> INSERT INTO WORKS_ON VALUES(888665555,20,NULL);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> show tables;
++------------------------------+
+| Tables_in_mysql_practice_153 |
++------------------------------+
+| department                   |
+| dependent                    |
+| dept_locations               |
+| employee                     |
+| works_on                     |
++------------------------------+
+5 rows in set (0.05 sec)
+
+mysql> CREATE TABLE project(Pname VARCHAR(20), Pnumber NUMERIC(2), Plocation VARCHAR(15), Dnum NUMERIC(2));
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> INSERT INTO project VALUES('productx',1,'bellaire',5);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> INSERT INTO project VALUES('producty',2,'sugarland',5);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> INSERT INTO project VALUES('productz',3,'houston',5);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> INSERT INTO project VALUES('computerization',10,'stafford',4);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO project VALUES('reorganization',20,'houston',1);
+Query OK, 1 row affected (0.06 sec)
+
+mysql> INSERT INTO project VALUES('newbenefits',30,'stafford',4);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> show tables;
++------------------------------+
+| Tables_in_mysql_practice_153 |
++------------------------------+
+| department                   |
+| dependent                    |
+| dept_locations               |
+| employee                     |
+| project                      |
+| works_on                     |
++------------------------------+
+6 rows in set (0.04 sec)
+
+mysql> select * from employee;
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                  | Sex  | Salary | Super_Ssn | Dno  |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731-foundren Houston, Tx | m    |  30000 | 333445555 |    5 |
+| Franklin | t     | wong    | 333445555 | 1955-12-08 | 638 voss Houston, Tx     | m    |  40000 | 888665555 |    5 |
+| Alicia   | J     | Zelaya  | 999887777 | 1941-06-20 | 321 castie spring, Tx    | F    |  25000 | 987654321 |    4 |
+| Jennifer | S     | Wallace | 987654321 | 1962-09-15 | 291 berry bellaire, Tx   | F    |  43000 | 888665555 |    4 |
+| Ramesh   | K     | Narayan | 666884444 | 1968-01-19 | 975 fire oak  humble, Tx | m    |  38000 | 333445555 |    5 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5361 rice   houston, Tx  | f    |  25000 | 333445555 |    5 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980 dallas  Houston, Tx  | m    |  25000 | 987654321 |    4 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450  stone  Houston, Tx  | m    |  55000 |      NULL |    1 |
++----------+-------+---------+-----------+------------+--------------------------+------+--------+-----------+------+
+8 rows in set (0.00 sec)
+
+mysql> select * from department;
++----------------+---------+-----------+----------------+
+| Dname          | Dnumber | Mgr_Ssn   | Mgr_start_date |
++----------------+---------+-----------+----------------+
+| RESEARCH       |       5 | 333445555 | 1988-05-22     |
+| ADMINISTRATION |       4 | 987654321 | 1995-01-01     |
+| HEADQUARTERS   |       1 | 888665555 | 1981-06-19     |
++----------------+---------+-----------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from project;
++-----------------+---------+-----------+------+
+| Pname           | Pnumber | Plocation | Dnum |
++-----------------+---------+-----------+------+
+| productx        |       1 | bellaire  |    5 |
+| producty        |       2 | sugarland |    5 |
+| productz        |       3 | houston   |    5 |
+| computerization |      10 | stafford  |    4 |
+| reorganization  |      20 | houston   |    1 |
+| newbenefits     |      30 | stafford  |    4 |
++-----------------+---------+-----------+------+
+6 rows in set (0.05 sec)
+
+mysql> select * from works_on;
++-----------+------+-------+
+| Essn      | Pno  | Hours |
++-----------+------+-------+
+| 123456789 |    1 |    33 |
+| 123456789 |    2 |     8 |
+| 666884444 |    3 |    40 |
+| 453453453 |    1 |    20 |
+| 453453453 |    2 |    20 |
+| 333445555 |    2 |    10 |
+| 333445555 |    3 |    10 |
+| 333445555 |   10 |    10 |
+| 333445555 |   20 |    10 |
+| 999887777 |   30 |    30 |
+| 999887777 |   10 |    10 |
+| 987987987 |   10 |    35 |
+| 987987987 |   30 |     5 |
+| 987654321 |   30 |    20 |
+| 987654321 |   20 |    15 |
+| 888665555 |   20 |  NULL |
++-----------+------+-------+
+16 rows in set (0.04 sec)
+
+mysql> select * from dependent;
++------+----------------+-----+------------+
+| ESSN | DEPENDENT_NAME | SEX | BDATE      |
++------+----------------+-----+------------+
+|  123 | ALICIA         | F   | 1978-12-12 |
+|  124 | THEODORE       | M   | 1983-10-25 |
+|  125 | JOY            | F   | 1958-05-03 |
+|  126 | ABNER          | M   | 1942-02-28 |
+| 1256 | OLIVE          | F   | NULL       |
++------+----------------+-----+------------+
+5 rows in set (0.04 sec)
+
+mysql> select * from dept_locations;
++---------+-----------+
+| Dnumber | Dlocation |
++---------+-----------+
+|       1 | Houston   |
+|       4 | Stafford  |
+|       5 | Sugarland |
+|       5 | Bellaire  |
+|       5 | Houston   |
++---------+-----------+
+5 rows in set (0.02 sec)
+
+###################To create All table at Once#############################################################
+####paste the following:
+
+create database yourDatabase;
+use yourDatabase;
+
+  create table EMPLOYEE(Fname varchar(20),Minit char(2),Lname varchar(10),Ssn numeric,Bdate date,address varchar(256),sex char(2),Salary numeric,Super_Ssn numeric NULL,Dno int);
+
+
+  insert into EMPLOYEE values('John','B','Smith',123456789,'1965-01-09','731 Fondren, Houstan, TX','M',30000,333445555,5);
+  
+
+  insert into EMPLOYEE values('Franklin','T','Wong',333445555,'1955-12-08','638 Voss, Houstan, TX','M',40000,888665555,5);
+  
+
+  insert into EMPLOYEE values('Alicia','J','Zelaya',999887777,'1968-01-19','3321 Castle, Spring, TX','F',25000,987654321,4);
+  
+
+  insert into EMPLOYEE values('Jennifer','S','Wallace',987654321,'1941-06-20','291 Berry, Bellaire, TX','F',43000,888665555,4);
+  
+
+  insert into EMPLOYEE values('Ramesh','K','Narayan',666884444,'1962-09-15','975 Fire Oak, Humble, TX','M',38000,333445555,5);
+  
+
+  insert into EMPLOYEE values('Joyce','A','English',453453453,'1972-07-31','5631 Rice, Houston, TX','F',25000,333445555,5);
+  
+
+  insert into EMPLOYEE values('Ahmad','V','Jabbar',987987987,'1969-03-29','980 Dallas, Houston, TX','M',25000,987654321,4);
+  
+
+  insert into EMPLOYEE values('James','E','Borg',888665555,'1937-11-10','450 Stone, Houston, TX','M',55000,NULL,1);
+
+  create table Department(Dname char(20),Dnumber int,Mgr_ssn int,Mgr_start_date date);
+
+  insert into Department values('Research',5,333445555,'1988-05-22');
+  
+
+  insert into department values('Administration',4,987654321,'1995-01-01');
+  
+
+  insert into Department values('Headquarters',1,888665555,'1981-06-19');
+  
+
+  create table works_on(Essn int,Pno int,Hours float);
+ 
+
+  insert into works_on values(123456789,1,32.5);
+  
+
+  insert into works_on values(123456789,2,7.5);
+  
+
+  insert into works_on values(666884444,3,40.0);
+  
+
+  insert into works_on values(453453453,1,20.0);
+  
+
+  insert into works_on values(453453453,2,20.0);
+  
+
+  insert into works_on values(333445555,2,10.0);
+  
+
+   insert into works_on values(333445555,3,10.0);
+  
+
+  insert into works_on values(333445555,10,10.0);
+  
+
+  insert into works_on values(333445555,20,10.0);
+  
+
+  insert into works_on values(999887777,30,30.0);
+  
+
+  insert into works_on values(999887777,10,35.0);
+  
+
+  insert into works_on values(987987987,30,5.0);
+  
+
+  insert into works_on values(987654321,30,20.0);
+  
+
+  insert into works_on values(987654321,20,15.0);
+  
+
+  insert into works_on values(888665555,20,NULL);
+  
+
+   create table dept_locations(Dnumber int,Dlocation varchar(20));
+ 
+
+   insert into dept_locations values(1,'Houseton');
+
+
+  insert into dept_locations values(4,'Stafford');
+  
+
+  insert into dept_locations values(5,'Bellaire');
+  
+
+  insert into dept_locations values(5,'Sugarland');
+  
+
+  insert into dept_locations values(5,'Houseton');
+  
+
+
+  create table project(Pname varchar(20),Pnumber int,Plocation char(20),Dnum int);
+ 
+
+  insert into project values('ProductX',1,'Bellaire',5);
+  
+
+  insert into project values('ProductY',2,'Sugarland',5);
+  
+
+  insert into project values('ProductZ',3,'Houseton',5);
+  
+
+  insert into project values('Computerization',10,'Stafford',4);
+  
+
+  insert into project values('Reorganization',20,'Houston',1);
+  
+
+  insert into project values('Newbenefits',30,'Stafford',4);
+  
+
+  create table dependent(Essn int,Dependent_name varchar(20),Sex char(2),Bdate date,Relationship char(20));
+ 
+
+  insert into dependent values(333445555,'Alice','F','1986-04-05','Daughter');
+  
+
+  insert into dependent values(333445555,'Theodore','M','1983-10-25','Son');
+  
+
+  insert into dependent values(333445555,'Joy','F','1958-05-03','Spouse');
+  
+
+  insert into dependent values(987654321,'Abner','M','1988-01-04','Spouse');
+  
+
+  insert into dependent values(123456789,'michael','M','1988-01-04','Son');
+  
+
+  insert into dependent values(123456789,'Alice','F','1988-12-30','Daughter');
+  
+
+  insert into dependent values(123456789,'Elizabeth','F','1967-05-05','Spouse');
+
+  
+

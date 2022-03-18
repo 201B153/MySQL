@@ -1,0 +1,214 @@
+EMPLOYEE (FNAME, MINIT, LNAME, SSN, BDATE, ADDRESS, SEX, SALARY,
+#SUPERSSN, #DNO)
+DEPARTMENT (DNAME, DNUMBER, #MGRSSN, MGRSTARTDATE)
+DEPT_LOCATIONS (#DNUMBER, DLOCATION)
+PROJECT (PNAME, PNUMBER, PLOCATION, #DNUM)
+WORKS_ON (#ESSN, #PNO, HOURS)
+DEPENDENT (#ESSN, DEPENDENT_NAME, SEX, BDATE, RELATIONSHIP)
+
+Welcome to the MySQL monitor. 
+
+##########
+Query 4
+Make a list of project numbers for projects that involve an employee whose last name is ‘Smith’, either as a worker
+or as a manager of the department that controls the project
+(SELECT DISTINCT PNUMBER
+FROM PROJECT, DEPARTMENT, EMPLOYEE
+WHERE DNUM = DNUMBER AND MGRSSN = SSN AND LNAME = ‘Smith’)
+UNION
+(SELECT DISTINCT PNUMBER
+FROM PROJECT, WORKS_ON, EMPLOYEE
+WHERE PNUMBER = PNO AND ESSN = SSN AND LNAME = ‘Smith’);
+Query 4A
+Reformulation of query 4 using nested queries
+SELECT DISTINCT PNUMBER
+FROM PROJECT
+WHERE PNUMBER IN ( SELECT PNUMBER
+FROM PROJECT, DEPARTMENT, EMPLOYEE
+WHERE DNUM = DNUMBER AND MGRSSN = SSN AND
+LNAME = ‘Smith’)
+OR
+PNUMBER IN (SELECT PNO
+FROM WORKS_ON, EMPLOYEE
+WHERE ESSN = SSN AND LNAME = ‘Smith’);
+Query 5
+Retrieve the names of all employees who have two or more dependents
+SELECT LNAME, FNAME
+FROM EMPLOYEE
+WHERE (SELECT COUNT (*)
+FROM DEPENDENT
+WHERE SSN = ESSN) >= 2;
+Query 6
+Retrieve the names of employees who have no dependents
+SELECT FNAME, LNAME
+FROM EMPLOYEE
+WHERE NOT EXISTS (SELECT *
+FROM DEPENDENT
+WHERE SSN = ESSN);
+
+Query 7
+List the names of managers who have at least one dependent
+SELECT FNAME, LNAME
+FROM EMPLOYEE
+WHERE EXISTS (SELECT *
+FROM DEPENDENT
+WHERE SSN = ESSN)
+AND
+EXISTS (SELECT *
+FROM DEPARTMENT
+WHERE SSN = MGRSSN);
+Query 8
+For each employee, retrieve the employee’s first and last name, and the first and last name of his or her immediate
+supervisor.
+SELECT E.FNAME, E.LNAME, S.FNAME, S.LNAME
+FROM EMPLOYEE AS E, EMPLOYEE AS S
+WHERE E.SUPERSSN = S.SSN;
+Query 8A
+Reformulation of query 8 to retrieve the last name of each employee and his or her supervisor, while renaming the
+resulting attribute names as EMPLOYEE_NAME and SUPERVISOR_NAME
+SELECT E.LNAME AS EMPLOYEE_NAME, S.LNAME AS SUPERVISOR_NAME
+FROM EMPLOYEE AS E, EMPLOYEE AS S
+WHERE E.SUPERSSN = S.SSN;
+Query 9
+Select all EMPLOYEE SSNs in the database
+SELECT SSN
+FROM EMPLOYEE;
+Query 10
+Select all combination of EMPLOYEE SSN and DEPARTMENT DNAME in the database
+SELECT SSN, DNAME
+FROM EMPLOYEE, DEPARTMENT;
+Query 10A
+Select the CROSS PRODUCT of the EMPLOYEE and DEPARTMENT relations
+SELECT *
+FROM EMPLOYEE, DEPARTMENT;
+Query 11
+Retrieve the salary of every employee
+SELECT ALL SALARY
+FROM EMPLOYEE;
+
+Query 11A
+Retrieve all distinct salary values
+SELECT DISTINCT SALARY
+FROM EMPLOYEE;
+Query 12
+Retrieve all employees whose address is in Houston, Texas
+SELECT FNAME, LNAME
+FROM EMPLOYEE
+WHERE ADDRESS LIKE ‘%Houston,TX%’;
+Query 12A
+Find all employees who were born during the 1950s
+SELECT FNAME, LNAME
+FROM EMPLOYEE
+WHERE BDATE LIKE ‘_ _ _ _ _ _ _ 70’;
+Query 13
+Show the resulting salaries if every employee working on the ‘ProductX’ project is given a 10 percent raise
+SELECT FNAME, LNAME, 1.1*SALARY
+FROM EMPLOYEE, WORKS_ON, PROJECT
+WHERE SSN = ESSN AND PNO = PNUMBER AND PNAME = ‘ProductX’;
+Query 14
+Retrieve all employees in department 5 whose salary is between £30,000 and £40,000
+SELECT *
+FROM EMPLOYEE
+WHERE (SALARY BETWEEN 30000 AND 40000) AND DNO = 5;
+Query 15
+Retrieve a list of employees and the projects they are working on, ordered by department and, within each
+department, ordered alphabetically by last name, first name
+SELECT DNAME, LNAME, FNAME, PNAME
+FROM DEPARTMENT, EMPLOYEE,WORKS_ON, PROJECT
+WHERE DNUMBER = DNO AND SSN = ESSN AND PNO = PNUMBER
+ORDER BY DNAME DESC, LNAME ASC, FNAME ASC;
+Query 16
+Retrieve the name of each employee who has a dependent with the same first name and same sex as the employee
+SELECT E.FNAME, E.LNAME
+FROM EMPLOYEE AS E
+WHERE E.SSN IN (SELECT ESSN
+FROM DEPENDENT
+WHERE E.FNAME = DEPENDENT_NAME AND E.SEX = SEX);
+
+Query 16A
+Reformulation of query 16 as single block query
+SELECT E.FNAME, E.LNAME
+FROM EMPLOYEE AS E, DEPENDENT AS D
+WHERE E.SSN = D.ESSN AND E.SEX = D.SEX AND E.FNAME = D.DEPENDENT_NAME;
+Query 16B
+Reformulation of query 16 using EXISTS
+SELECT E.FNAME, E.LNAME
+FROM EMPLOYEE AS E
+WHERE EXISTS (SELECT *
+FROM DEPENDENT
+WHERE E.SSN = ESSN AND E.SEX = SEX AND
+E.FNAME = DEPENDENT_NAME);
+Query 17
+Retrieve the social security numbers of all employees who work on project number 1, 2 or 3
+SELECT DISTINCT ESSN
+FROM WORKS_ON
+WHERE PNO IN (1,2,3);
+Query 18
+Retrieve the names of all employees who do not have supervisors
+SELECT FNAME, LNAME
+FROM EMPLOYEE
+WHERE SUPERSSN IS NULL;
+Query 19
+Find the sum of the salaries of all employees, the maximum salary, the minimum salary, and the average salary
+SELECT SUM (SALARY), MAX (SALARY), MIN (SALARY), AVG (SALARY)
+FROM EMPLOYEE;
+Query 20
+Find the sum of the salaries of all employees of the ‘Research’ department, as well as the maximum salary, the
+minimum salary, and the average salary in this department
+SELECT SUM (SALARY), MAX (SALARY), MIN (SALARY), AVG (SALARY)
+FROM EMPLOYEE, DEPARTMENT
+WHERE DNO = DNUMBER AND DNAME = ‘Research’;
+Query 21
+Retrieve the total number of employees in the company
+SELECT COUNT (*)
+FROM EMPLOYEE;
+
+Query 22
+Retrieve the number of employees in the ‘Research’ department
+SELECT COUNT (*)
+FROM EMPLOYEE, DEPARTMENT
+WHERE DNO = DNUMBER AND DNAME = ‘Research’;
+Query 23
+Count the number of distinct salary values in the database
+SELECT COUNT (DISTINCT SALARY)
+FROM EMPLOYEE;
+Query 24
+For each department, retrieve the department number, the number of employees in the department, and their average
+salary
+SELECT DNO, COUNT (*), AVG (SALARY)
+FROM EMPLOYEE
+GROUP BY DNO;
+Query 25
+For each project, retrieve the project number, the project name, and the number of employees who work on that
+project
+SELECT PNUMBER, PNAME, COUNT (*)
+FROM PROJECT, WORKS_ON
+WHERE PNUMBER = PNO
+GROUP BY PNUMBER, PNAME;
+Query 26
+For each project on which more than two employees work, retrieve the project number, the project name, and the
+number of employees who work on the project
+SELECT PNUMBER, PNAME, COUNT (*)
+FROM PROJECT, WORKS_ON
+WHERE PNUMBER = PNO
+GROUP BY PNUMBER, PNAME
+HAVING COUNT (*) > 2;
+Query 27
+For each project, retrieve the project number, the project name, and the number of employees from department 5 who
+work on the project
+SELECT PNUMBER, PNAME, COUNT (*)
+FROM PROJECT, WORKS_ON, EMPLOYEE
+WHERE PNUMBER = PNO AND SSN = ESSN AND DNO = 5
+GROUP BY PNUMBER, PNAME;
+
+Query 28
+For each department that has more than five employees, retrieve the department number and the number of its
+employees who are making more than £40,000
+SELECT DNUMBER, COUNT (*)
+FROM DEPARTMENT, EMPLOYEE
+WHERE DNUMBER = DNO AND SALARY > 40000 AND
+DNO IN (SELECT DNO
+FROM EMPLOYEE
+GROUP BY DNO
+HAVING COUNT (*) > 5)
+GROUP BY DNUMBER;
